@@ -5,7 +5,7 @@ import packet.HabboPacket
 import packet.PacketHeader
 
 @PacketHeader(header = 2312)
-class EnterRoomPacket : HabboPacket() {
+class EnterRoomRequestPacket : HabboPacket() {
     @PacketField(order = 1)
     var roomId: Int = 0
 

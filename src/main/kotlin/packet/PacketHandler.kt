@@ -2,7 +2,7 @@ package packet
 
 import binary.Deserializer
 import packet.handshake.*
-import packet.room.EnterRoomPacket
+import packet.room.*
 import packet.user.*
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
@@ -39,13 +39,19 @@ class PacketHandler {
         registerPacket(UserPermissionsPacket::class)
         registerPacket(UserTagsPacket::class)
         registerPacket(UserSettingsPacket::class)
+        registerPacket(UserHomeRoomPacket::class)
     }
 
     private fun registerRoomPackets() {
         // CLIENT
-        registerPacket(EnterRoomPacket::class)
+        registerPacket(EnterRoomRequestPacket::class)
+        registerPacket(GetRoomEntryDataPacket::class)
+        registerPacket(SendRoomMessagePacket::class)
 
         // SERVER
+        registerPacket(EnterRoomResponsePacket::class)
+        registerPacket(RoomUnitInfoPacket::class)
+        registerPacket(UnitChatPacket::class)
     }
 
     private fun registerPacket(packet: KClass<out HabboPacket>) {

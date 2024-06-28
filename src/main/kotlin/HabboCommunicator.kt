@@ -1,11 +1,9 @@
 import crypto.ROT13
 import packet.handshake.*
-import packet.room.EnterRoomPacket
-import packet.user.UserTagsPacket
 
-class HabboCommunicator(host: String, port: Int) {
+open class HabboCommunicator(host: String, port: Int) {
 
-    private val connection: HabboConnection
+    protected val connection: HabboConnection
 
     init {
         connection = HabboConnection(host, port)
@@ -14,13 +12,7 @@ class HabboCommunicator(host: String, port: Int) {
             connection.sendPacket(PongPacket())
         }
 
-        connection.listenPacket<AuthenticatedPacket> {
-            connection.sendPacket(EnterRoomPacket().apply {
-                roomId = 6318504
-            })
-        }
-
-        sendHandshake("ffa01e9ff9c7edc08523d62de7e2c9d9d9792f3a-41591da0ca081e73c832bc97fec1b108")
+        sendHandshake("c500ec850ca9579515b5e4469061e0b3a8d95d60-41591da0ca081e73c832bc97fec1b108")
     }
 
     private fun sendHandshake(sso: String) {
