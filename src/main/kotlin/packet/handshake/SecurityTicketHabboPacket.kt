@@ -1,9 +1,9 @@
-package packet.outgoing.handshake
+package packet.handshake
 
 import binary.PacketField
-import packet.Packet
+import packet.HabboPacket
 
-class SecurityTicketPacket : Packet() {
+class SecurityTicketHabboPacket : HabboPacket() {
     @PacketField(order = 1)
     val headerId: Short = 2419
 
