@@ -2,10 +2,8 @@ package binary
 
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
-import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.full.memberProperties
 import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.full.*
 
 class Deserializer {
 
@@ -23,24 +21,41 @@ class Deserializer {
                 .sortedBy { it.findAnnotation<PacketField>()?.order }
 
             for (property in properties) {
-                val value: Any = when (property.returnType.classifier) {
-                    Int::class -> buffer.int
-                    Short::class -> buffer.short
-                    String::class -> {
-                        val length = buffer.short.toInt()
-                        val stringBytes = ByteArray(length)
-                        buffer.get(stringBytes)
-                        String(stringBytes, Charsets.UTF_8)
-                    }
-
-                    else -> throw IllegalArgumentException("Unsupported type")
-                }
+                val value: Any = parsePrimitiveValue(buffer, property.returnType.classifier as KClass<*>)
                 if (property is KMutableProperty1) {
                     property.setter.call(instance, value)
                 }
             }
 
             return instance
+        }
+
+        private fun parsePrimitiveValue(buffer: ByteBuffer, elementType: KClass<*>): Any {
+            return when {
+                elementType == Int::class -> buffer.int
+                elementType == Short::class -> buffer.short
+                elementType == String::class -> {
+                    val length = buffer.short.toInt()
+                    val stringBytes = ByteArray(length)
+                    buffer.get(stringBytes)
+                    String(stringBytes, Charsets.UTF_8)
+                }
+                elementType == Boolean::class -> {
+                    val byteValue = buffer.get()
+                    byteValue == 1.toByte()
+                }
+                elementType.java.isArray -> {
+                    val length = buffer.int
+                    val array = java.lang.reflect.Array.newInstance(elementType.java.componentType, length) as Array<Any>
+
+                    for (i in array.indices) {
+                        array[i] = parsePrimitiveValue(buffer, elementType.java.componentType.kotlin)
+                    }
+                    array
+                }
+
+                else -> throw IllegalArgumentException("Unsupported type")
+            }
         }
     }
 }

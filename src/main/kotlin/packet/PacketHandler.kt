@@ -2,6 +2,8 @@ package packet
 
 import binary.Deserializer
 import packet.handshake.*
+import packet.room.EnterRoomPacket
+import packet.user.*
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
@@ -12,14 +14,38 @@ class PacketHandler {
 
     init {
         registerHandshakePackets()
+        registerUserPackets()
+        registerRoomPackets()
     }
 
     private fun registerHandshakePackets() {
-        registerPacket(PingPacket::class)
+        // CLIENT
         registerPacket(PongPacket::class)
         registerPacket(ReleaseVersionPacket::class)
         registerPacket(SecurityTicketPacket::class)
         registerPacket(UniqueMachineIDPacket::class)
+
+        // SERVER
+        registerPacket(PingPacket::class)
+        registerPacket(AuthenticatedPacket::class)
+        registerPacket(UniqueMachineIDResponsePacket::class)
+        registerPacket(AvailabilityStatusPacket::class)
+    }
+
+    private fun registerUserPackets() {
+        // CLIENT
+
+        // SERVER
+        registerPacket(UserPermissionsPacket::class)
+        registerPacket(UserTagsPacket::class)
+        registerPacket(UserSettingsPacket::class)
+    }
+
+    private fun registerRoomPackets() {
+        // CLIENT
+        registerPacket(EnterRoomPacket::class)
+
+        // SERVER
     }
 
     private fun registerPacket(packet: KClass<out HabboPacket>) {
@@ -30,10 +56,14 @@ class PacketHandler {
     }
 
     fun parsePacket(data: ByteArray): HabboPacket? {
+        if (data.size < 2) {
+            throw Exception("Data has less than 2 bytes")
+        }
+
         val header = ByteBuffer.wrap(data).short
         val packet = packets[header] ?: return null
 
-        return Deserializer.parse(data, packet)
+        return Deserializer.parse(data.copyOfRange(2, data.size), packet)
     }
 
 }

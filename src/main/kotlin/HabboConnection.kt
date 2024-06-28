@@ -7,6 +7,7 @@ import packet.PacketHeader
 import java.io.OutputStream
 import java.net.Socket
 import java.nio.ByteBuffer
+import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
 class HabboConnection(host: String, port: Int) {
@@ -14,32 +15,38 @@ class HabboConnection(host: String, port: Int) {
     private val socket: Socket
     private val output: OutputStream
     private val packetHandler: PacketHandler
+    val listeners: MutableMap<KClass<out HabboPacket>, MutableList<(HabboPacket) -> Unit>> = mutableMapOf()
 
     init {
         println("[DEBUG]: Connecting...")
         socket = Socket(host, port)
         println("[DEBUG]: Connected.")
-
         packetHandler = PacketHandler()
-
         output = socket.getOutputStream()
         val input = socket.getInputStream()
         CoroutineScope(Dispatchers.IO).launch {
             while (true) {
                 var bytes = ByteArray(4)
                 var n = input.read(bytes)
-                if (n < 4) break;
+                if (n < 4) break
 
                 val length = ByteBuffer.wrap(bytes).int
                 bytes = ByteArray(length)
                 n = input.read(bytes)
-                if (n < length) break;
+                if (n < length) break
 
                 val packet = packetHandler.parsePacket(bytes)
                 if (packet != null) {
-                    println(packet::class.simpleName)
+                    val _listeners = listeners[packet::class]
+                    if (_listeners != null) {
+                        for (listener in _listeners) {
+                            launch {
+                                listener(packet)
+                            }
+                        }
+                    }
                 } else {
-                    println("[DEBUG]: Unknown incoming packet")
+                    println("[DEBUG]: Unknown incoming packet {${ByteBuffer.wrap(bytes).short}}")
                 }
             }
         }
@@ -54,6 +61,15 @@ class HabboConnection(host: String, port: Int) {
         for (packet in packets) {
             output.write(packet.compose())
         }
+    }
+
+    inline fun <reified T : HabboPacket> listenPacket(crossinline action: (T) -> Unit) {
+        var _listeners = listeners[T::class]
+        if (_listeners == null) {
+            _listeners = mutableListOf()
+            listeners[T::class] = _listeners
+        }
+        _listeners.add { packet -> action(packet as T) }
     }
 
 }
