@@ -2,14 +2,13 @@ package packet.handshake
 
 import binary.PacketField
 import packet.HabboPacket
+import packet.PacketHeader
 
-class UniqueMachineIDHabboPacket : HabboPacket() {
+@PacketHeader(header = 2490)
+class UniqueMachineIDPacket : HabboPacket() {
     @PacketField(order = 1)
-    val headerId: Short = 2490
-
-    @PacketField(order = 2)
     var machineId: String = ""
 
-    @PacketField(order = 3)
+    @PacketField(order = 2)
     var fingerprint: String = ""
 }

@@ -2,17 +2,16 @@ package packet.handshake
 
 import binary.PacketField
 import packet.HabboPacket
+import packet.PacketHeader
 
-class SecurityTicketHabboPacket : HabboPacket() {
+@PacketHeader(header = 2419)
+class SecurityTicketPacket : HabboPacket() {
     @PacketField(order = 1)
-    val headerId: Short = 2419
-
-    @PacketField(order = 2)
     var ticket: String = ""
 
-    @PacketField(order = 3)
+    @PacketField(order = 2)
     var time: Int = 0
 
-    @PacketField(order = 4)
+    @PacketField(order = 3)
     var encryptedTicket: String = ""
 }
