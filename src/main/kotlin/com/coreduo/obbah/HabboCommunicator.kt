@@ -1,11 +1,10 @@
 package com.coreduo.obbah
 
+import com.coreduo.obbah.connection.HabboConnection
 import com.coreduo.obbah.crypto.ROT13
 import com.coreduo.obbah.packet.handshake.*
 
-open class HabboCommunicator(host: String, port: Int) {
-
-    private val connection: HabboConnection = HabboConnection(host, port)
+open class HabboCommunicator(private val connection: HabboConnection) {
 
     init {
         connection.listenPacket<PingPacket> {
