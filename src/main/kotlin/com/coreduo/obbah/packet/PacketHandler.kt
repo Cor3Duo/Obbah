@@ -2,12 +2,11 @@ package com.coreduo.obbah.packet
 
 import com.coreduo.obbah.packet.handshake.*
 import com.coreduo.obbah.packet.room.*
-import com.coreduo.obbah.packet.room.access.EnterRoomRequestPacket
-import com.coreduo.obbah.packet.room.access.EnterRoomResponsePacket
+import com.coreduo.obbah.packet.room.access.RoomEntryRequestPacket
+import com.coreduo.obbah.packet.room.access.RoomEntrySuccessPacket
 import com.coreduo.obbah.packet.room.access.GetRoomEntryDataPacket
-import com.coreduo.obbah.packet.room.unit.RoomUnitInfoPacket
-import com.coreduo.obbah.packet.room.unit.RoomUnitPacket
-import com.coreduo.obbah.packet.room.unit.UnitChatPacket
+import com.coreduo.obbah.packet.room.access.RoomDoorbellAccessPacket
+import com.coreduo.obbah.packet.room.unit.*
 import com.coreduo.obbah.packet.user.*
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
@@ -49,16 +48,19 @@ class PacketHandler {
 
     private fun registerRoomPackets() {
         // CLIENT
-        registerPacket(EnterRoomRequestPacket::class)
+        registerPacket(RoomEntryRequestPacket::class)
         registerPacket(GetRoomEntryDataPacket::class)
         registerPacket(SendRoomMessagePacket::class)
         registerPacket(RoomWalkRequestPacket::class)
+        registerPacket(RoomDoorbellAccessPacket::class)
 
         // SERVER
-        registerPacket(EnterRoomResponsePacket::class)
+        registerPacket(RoomEntrySuccessPacket::class)
         registerPacket(RoomUnitInfoPacket::class)
         registerPacket(UnitChatPacket::class)
         registerPacket(RoomUnitPacket::class)
+        registerPacket(RoomUnitRemovePacket::class)
+        registerPacket(RoomUnitStatusPacket::class)
     }
 
     private fun registerPacket(packet: KClass<out HabboPacket>) {
