@@ -56,12 +56,12 @@ class HabboFlashConnection(host: String, port: Int) : HabboConnection() {
 
     override fun sendPacket(packet: HabboPacket) {
         println("Sending packet ${packet::class.findAnnotation<PacketHeader>()?.header}")
-        output.write(packet.compose())
+        output.write(packet.serialize())
     }
 
     override fun sendPackets(packets: Array<HabboPacket>) {
         for (packet in packets) {
-            output.write(packet.compose())
+            output.write(packet.serialize())
         }
     }
 

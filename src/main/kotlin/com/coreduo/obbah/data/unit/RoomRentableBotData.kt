@@ -1,17 +1,36 @@
 package com.coreduo.obbah.data.unit
 
-import com.coreduo.obbah.binary.PacketField
+import java.nio.ByteBuffer
 
-class RoomRentableBotData {
-    @PacketField(order = 1)
+class RoomRentableBotData : RoomUnitData() {
+    override var type = 4
     var sex: String = ""
-
-    @PacketField(order = 2)
     var ownerId: Int = -1
-
-    @PacketField(order = 3)
     var ownerName: String = ""
+    var skills: MutableList<Short> = mutableListOf()
 
-    @PacketField(order = 4)
-    var skills: Array<Short> = arrayOf()
+    override fun deserialize(data: ByteBuffer) {
+        super.deserialize(data)
+
+        sex = readString()
+        ownerId = readInt()
+        ownerName = readString()
+        val skillsCount = readInt()
+        for (i in 0 until skillsCount) {
+            skills.add(readShort())
+        }
+    }
+
+    override fun serialize(): ByteArray {
+        super.serialize()
+        writeString(sex)
+        writeInt(ownerId)
+        writeString(ownerName)
+        writeInt(skills.size)
+        for (skill in skills) {
+            writeShort(skill)
+        }
+
+        return getData()
+    }
 }

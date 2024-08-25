@@ -41,13 +41,22 @@ class HabboNitroConnection(url: String, origin: String) : HabboConnection() {
     private suspend fun connectSynchronously(client: OkHttpClient, request: Request): WebSocket =
         withContext(Dispatchers.IO) {
             suspendCoroutine { continuation ->
+                var resumed = false
+
                 val listener = object : WebSocketListener() {
                     override fun onOpen(webSocket: WebSocket, response: Response) {
-                        continuation.resume(webSocket)
+                        if (!resumed) {
+                            resumed = true
+                            continuation.resume(webSocket)
+                        }
                     }
 
                     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                        continuation.resumeWithException(t)
+                        throw t
+//                        if (!resumed) {
+//                            resumed = true
+//                            continuation.resumeWithException(t)
+//                        }
                     }
 
                     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
@@ -89,12 +98,12 @@ class HabboNitroConnection(url: String, origin: String) : HabboConnection() {
 
     override fun sendPacket(packet: HabboPacket) {
         println("Sending packet ${packet::class.findAnnotation<PacketHeader>()?.header}")
-        socket.send(packet.compose().toByteString())
+        socket.send(packet.serialize().toByteString())
     }
 
     override fun sendPackets(packets: Array<HabboPacket>) {
         for (packet in packets) {
-            socket.send(packet.compose().toByteString())
+            socket.send(packet.serialize().toByteString())
         }
     }
 

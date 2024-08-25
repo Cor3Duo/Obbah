@@ -1,26 +1,46 @@
 package com.coreduo.obbah.packet.room.unit
 
-import com.coreduo.obbah.binary.PacketField
+import com.coreduo.obbah.data.unit.*
 import com.coreduo.obbah.packet.HabboPacket
 import com.coreduo.obbah.packet.PacketHeader
+import java.nio.ByteBuffer
 
 @PacketHeader(header = 1446)
 class UnitChatPacket : HabboPacket() {
-    @PacketField(order = 1)
     var roomIndex: Int = -1
-
-    @PacketField(order = 2)
     var message: String = ""
-
-    @PacketField(order = 3)
     var gesture: Int = -1
-
-    @PacketField(order = 4)
     var bubbleId: Int = -1
-
-    @PacketField(order = 5)
-    var urls: Array<String> = arrayOf()
-
-    @PacketField(order = 6)
+    var urls: MutableList<String> = mutableListOf()
     var messageLength: Int = -1
+
+    override fun deserialize(data: ByteArray) {
+        super.deserialize(data)
+
+        roomIndex = readInt()
+        message = readString()
+        gesture = readInt()
+        bubbleId = readInt()
+        val urlsCount = readInt()
+        for (i in 0 until urlsCount) {
+            urls.add(readString())
+        }
+        messageLength = readInt()
+    }
+
+    override fun serialize(): ByteArray {
+        clear()
+
+        writeInt(roomIndex)
+        writeString(message)
+        writeInt(gesture)
+        writeInt(bubbleId)
+        writeInt(urls.size)
+        for (url in urls) {
+            writeString(url)
+        }
+        writeInt(messageLength)
+
+        return super.serialize()
+    }
 }

@@ -4,6 +4,12 @@ import com.coreduo.obbah.connection.HabboConnection
 import com.coreduo.obbah.crypto.ROT13
 import com.coreduo.obbah.packet.handshake.*
 
+fun toHexStream(data: ByteArray): String {
+    return data.joinToString("") {
+        "%02x".format(it)
+    }
+}
+
 open class HabboCommunicator(private val connection: HabboConnection) {
 
     init {
@@ -30,6 +36,10 @@ open class HabboCommunicator(private val connection: HabboConnection) {
             time = 9143
             encryptedTicket = ROT13.encrypt(sso)
         }
+
+        println(toHexStream(releaseVersionPacket.serialize()))
+        println(toHexStream(uniqueMachineIDPacket.serialize()))
+        println(toHexStream(securityTicketPacket.serialize()))
 
         connection.sendPacket(releaseVersionPacket)
         connection.sendPacket(uniqueMachineIDPacket)

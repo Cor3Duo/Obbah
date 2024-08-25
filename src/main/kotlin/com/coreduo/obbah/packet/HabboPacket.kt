@@ -1,25 +1,36 @@
 package com.coreduo.obbah.packet
 
-import com.coreduo.obbah.binary.Serializer
+import com.coreduo.obbah.toHexStream
 import java.nio.ByteBuffer
 import kotlin.reflect.full.findAnnotation
 
-open class HabboPacket {
+open class HabboPacket : HabboBuffer() {
 
-    fun compose(): ByteArray {
+    init {
+        clear()
+    }
+
+    final override fun clear() {
+        buffer.clear()
+
         val header = this::class.findAnnotation<PacketHeader>()?.header
             ?: throw IllegalArgumentException("PacketHeader annotation missing")
 
-        val bytes = Serializer.compose(this)
-        val buffer = ByteBuffer.allocate(6 + bytes.size)
-        buffer.putInt(bytes.size + 2)
-        buffer.putShort(header)
-        buffer.put(bytes)
+        writeInt(0)
+        writeShort(header)
+    }
 
-        buffer.flip()
-        val byteArray = ByteArray(buffer.remaining())
-        buffer.get(byteArray)
-        return byteArray
+    open fun deserialize(data: ByteArray) {
+        buffer = ByteBuffer.wrap(data)
+    }
+
+    open fun serialize(): ByteArray {
+        val pos = buffer.position()
+        buffer.position(0)
+        writeInt(pos - 4)
+        buffer.position(pos)
+
+        return getData()
     }
 
 }

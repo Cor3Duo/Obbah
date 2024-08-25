@@ -1,6 +1,5 @@
 package com.coreduo.obbah.packet
 
-import com.coreduo.obbah.binary.Deserializer
 import com.coreduo.obbah.packet.handshake.*
 import com.coreduo.obbah.packet.room.*
 import com.coreduo.obbah.packet.room.access.EnterRoomRequestPacket
@@ -75,9 +74,15 @@ class PacketHandler {
         }
 
         val header = ByteBuffer.wrap(data).short
-        val packet = packets[header] ?: return null
+        val packetClass = packets[header] ?: return null
 
-        return Deserializer.parse(data.copyOfRange(2, data.size), packet)
+        val packetInstance = packetClass.java.getDeclaredConstructor().newInstance()
+
+        val arrayBuffer = data.copyOfRange(2, data.size)
+
+        packetInstance.deserialize(arrayBuffer)
+
+        return packetInstance
     }
 
 }
