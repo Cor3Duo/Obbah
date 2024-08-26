@@ -1,5 +1,8 @@
 package com.coreduo.obbah.packet
 
+import com.coreduo.obbah.packet.catalog.CatalogPurchaseGiftPacket
+import com.coreduo.obbah.packet.catalog.CatalogIndexRequestPacket
+import com.coreduo.obbah.packet.catalog.CatalogIndexResponsePacket
 import com.coreduo.obbah.packet.handshake.*
 import com.coreduo.obbah.packet.room.*
 import com.coreduo.obbah.packet.room.access.RoomEntryRequestPacket
@@ -20,6 +23,7 @@ class PacketHandler {
         registerHandshakePackets()
         registerUserPackets()
         registerRoomPackets()
+        registerCatalogPackets()
     }
 
     private fun registerHandshakePackets() {
@@ -61,6 +65,15 @@ class PacketHandler {
         registerPacket(RoomUnitPacket::class)
         registerPacket(RoomUnitRemovePacket::class)
         registerPacket(RoomUnitStatusPacket::class)
+    }
+
+    private fun registerCatalogPackets() {
+        // CLIENT
+        registerPacket(CatalogPurchaseGiftPacket::class)
+        registerPacket(CatalogIndexRequestPacket::class)
+
+        // SERVER
+        registerPacket(CatalogIndexResponsePacket::class)
     }
 
     private fun registerPacket(packet: KClass<out HabboPacket>) {
