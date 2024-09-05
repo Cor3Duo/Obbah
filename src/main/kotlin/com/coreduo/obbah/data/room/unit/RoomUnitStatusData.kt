@@ -1,4 +1,4 @@
-package com.coreduo.obbah.data.unit
+package com.coreduo.obbah.data.room.unit
 
 import com.coreduo.obbah.packet.HabboBuffer
 import java.nio.ByteBuffer

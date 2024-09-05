@@ -1,9 +1,8 @@
 package com.coreduo.obbah.packet.room.unit
 
-import com.coreduo.obbah.data.unit.*
+import com.coreduo.obbah.data.room.unit.*
 import com.coreduo.obbah.packet.HabboPacket
 import com.coreduo.obbah.packet.PacketHeader
-import java.nio.ByteBuffer
 
 @PacketHeader(header = 374)
 class RoomUnitPacket : HabboPacket() {

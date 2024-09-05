@@ -1,6 +1,5 @@
 package com.coreduo.obbah.packet
 
-import com.coreduo.obbah.toHexStream
 import java.nio.ByteBuffer
 import kotlin.reflect.full.findAnnotation
 

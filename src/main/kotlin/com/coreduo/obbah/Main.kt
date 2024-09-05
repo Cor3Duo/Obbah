@@ -1,8 +1,8 @@
 package com.coreduo.obbah
 
 import com.coreduo.obbah.connection.HabboNitroConnection
-import com.coreduo.obbah.data.unit.RoomUnitData
 import com.coreduo.obbah.packet.handshake.AuthenticatedPacket
+import com.coreduo.obbah.packet.inventory.achievements.AchievementListPacket
 import com.coreduo.obbah.packet.room.RoomWalkRequestPacket
 import com.coreduo.obbah.packet.room.SendRoomMessagePacket
 import com.coreduo.obbah.packet.room.access.RoomEntryRequestPacket
@@ -19,32 +19,38 @@ class ObbahClient : HabboCommunicator(HabboNitroConnection("wss://live-arena-d74
     init {
         var following = -1
 
+        getHabboConnection().listenPacket<AchievementListPacket> {
+            for (achievement in it.achievements) {
+                println(achievement)
+            }
+        }
+
         getHabboConnection().listenPacket<RoomEntrySuccessPacket> {
             getHabboConnection().sendPacket(GetRoomEntryDataPacket())
         }
 
         getHabboConnection().listenPacket<AuthenticatedPacket> {
             getHabboConnection().sendPacket(RoomEntryRequestPacket().apply {
-                roomId = 6383677
+                roomId = 5407027
             })
         }
 
         getHabboConnection().listenPacket<RoomUnitPacket> {
-            val links = findLinks(it.units[0].custom)
-            getHabboConnection().sendPacket(SendRoomMessagePacket().apply {
-                message = "Someone entered in room."
-            })
-            if (links.isNotEmpty()) {
-                getHabboConnection().sendPacket(SendRoomMessagePacket().apply {
-                    message = "Links found: ${links.joinToString(", ")}"
-                })
-            }
+//            val links = findLinks(it.units[0].custom)
+//            getHabboConnection().sendPacket(SendRoomMessagePacket().apply {
+//                message = "Someone entered in room."
+//            })
+//            if (links.isNotEmpty()) {
+//                getHabboConnection().sendPacket(SendRoomMessagePacket().apply {
+//                    message = "Links found: ${links.joinToString(", ")}"
+//                })
+//            }
         }
 
         getHabboConnection().listenPacket<RoomUnitRemovePacket> {
-            getHabboConnection().sendPacket(SendRoomMessagePacket().apply {
-                message = "Someone exits from room."
-            })
+//            getHabboConnection().sendPacket(SendRoomMessagePacket().apply {
+//                message = "Someone exits from room."
+//            })
         }
 
         getHabboConnection().listenPacket<RoomUnitStatusPacket> {

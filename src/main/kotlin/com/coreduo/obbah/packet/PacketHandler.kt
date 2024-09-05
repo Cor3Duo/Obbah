@@ -11,6 +11,7 @@ import com.coreduo.obbah.packet.room.access.GetRoomEntryDataPacket
 import com.coreduo.obbah.packet.room.access.RoomDoorbellAccessPacket
 import com.coreduo.obbah.packet.room.unit.*
 import com.coreduo.obbah.packet.user.*
+import java.io.File
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
@@ -20,10 +21,45 @@ class PacketHandler {
     private val packets: MutableMap<Short, KClass<out HabboPacket>> = mutableMapOf()
 
     init {
-        registerHandshakePackets()
-        registerUserPackets()
-        registerRoomPackets()
-        registerCatalogPackets()
+//        registerHandshakePackets()
+//        registerUserPackets()
+//        registerRoomPackets()
+//        registerCatalogPackets()
+        registerPackets()
+    }
+
+    private fun registerPackets() {
+        val packageName = "com.coreduo.obbah.packet"
+        val classLoader = Thread.currentThread().contextClassLoader
+        val path = packageName.replace('.', '/')
+        val resources = classLoader.getResources(path)
+
+        val classes = mutableListOf<Class<out HabboPacket>>()
+
+        while (resources.hasMoreElements()) {
+            val resource = resources.nextElement()
+            val directory = File(resource.file)
+            if (directory.exists()) {
+                directory.walkTopDown().forEach { file ->
+                    if (file.name.endsWith(".class")) {
+                        val relativePath = file.relativeTo(directory).path
+                        val className = relativePath
+                            .replace(File.separatorChar, '.')
+                            .removeSuffix(".class")
+
+                        val fullClassName = "$packageName.${className.substringAfterLast(packageName)}"
+
+                        try {
+                            val clazz = Class.forName(fullClassName)
+                            if (HabboPacket::class.java.isAssignableFrom(clazz) && clazz != HabboPacket::class.java) {
+                                registerPacket(clazz.kotlin as KClass<out HabboPacket>)
+                            }
+                        } catch (e: ClassNotFoundException) {
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun registerHandshakePackets() {

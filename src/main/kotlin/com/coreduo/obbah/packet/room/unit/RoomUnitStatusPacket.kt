@@ -1,6 +1,6 @@
 package com.coreduo.obbah.packet.room.unit
 
-import com.coreduo.obbah.data.unit.RoomUnitStatusData
+import com.coreduo.obbah.data.room.unit.RoomUnitStatusData
 import com.coreduo.obbah.packet.HabboPacket
 import com.coreduo.obbah.packet.PacketHeader
 
