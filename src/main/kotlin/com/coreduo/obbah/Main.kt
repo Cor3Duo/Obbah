@@ -8,6 +8,7 @@ import com.coreduo.obbah.packet.room.SendRoomMessagePacket
 import com.coreduo.obbah.packet.room.access.RoomEntryRequestPacket
 import com.coreduo.obbah.packet.room.access.RoomEntrySuccessPacket
 import com.coreduo.obbah.packet.room.access.GetRoomEntryDataPacket
+import com.coreduo.obbah.packet.room.furniture.FurnitureFloorPacket
 import com.coreduo.obbah.packet.room.unit.RoomUnitPacket
 import com.coreduo.obbah.packet.room.unit.RoomUnitRemovePacket
 import com.coreduo.obbah.packet.room.unit.RoomUnitStatusPacket
